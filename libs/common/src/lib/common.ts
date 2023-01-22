@@ -3,5 +3,5 @@ export function common(): string {
 }
 
 export function elvana(): string {
-    return 'Gjata';
+    return 'Mdon2';
 }
