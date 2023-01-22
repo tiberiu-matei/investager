@@ -7,6 +7,7 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
             ui-affected: ${{ steps.ui-affected.outputs.ui-affected }}
+            api-affected: ${{ steps.api-affected.outputs.api-affected }}
         steps:
             - uses: actions/checkout@v3
               with:
@@ -22,17 +23,27 @@ jobs:
 
             - id: ui-affected
               run: if test -d dist/apps/ui; then echo "ui-affected=true" >> $GITHUB_OUTPUT; else echo "ui-affected=false" >> $GITHUB_OUTPUT; fi
-
             - name: Zip UI
               if: ${{ steps.ui-affected.outputs.ui-affected == 'true' }}
               run: (cd dist/apps/ui && zip -r ui.zip .)
-
-            - name: Upload
+            - name: Upload UI
               if: ${{ steps.ui-affected.outputs.ui-affected == 'true' }}
               uses: actions/upload-artifact@v3
               with:
                   name: ui
                   path: dist/apps/ui/ui.zip
+
+            - id: api-affected
+              run: if test -d dist/apps/api; then echo "api-affected=true" >> $GITHUB_OUTPUT; else echo "api-affected=false" >> $GITHUB_OUTPUT; fi
+            - name: Zip API
+              if: ${{ steps.api-affected.outputs.api-affected == 'true' }}
+              run: (cd dist/apps/api && zip -r api.zip .)
+            - name: Upload API
+              if: ${{ steps.api-affected.outputs.api-affected == 'true' }}
+              uses: actions/upload-artifact@v3
+              with:
+                  name: api
+                  path: dist/apps/api/api.zip
     deploy-ui:
         if: github.ref == 'refs/heads/main'
         runs-on: ubuntu-latest
@@ -65,3 +76,35 @@ jobs:
                       rm -rf ui
                       unzip ui.zip -d ui
                       rm ui.zip
+    deploy-api:
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+            - name: Get artifact
+              if: ${{ needs.build.outputs.api-affected == 'true' }}
+              uses: actions/download-artifact@v3
+              with:
+                  name: api
+            - name: Copy artifact
+              if: ${{ needs.build.outputs.api-affected == 'true' }}
+              uses: appleboy/scp-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.KEY }}
+                  source: 'api.zip'
+                  target: '/home/ubuntu'
+            - name: Upgrade
+              if: ${{ needs.build.outputs.api-affected == 'true' }}
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.KEY }}
+                  script: |
+                      cd /home/ubuntu
+                      zip -r "$(date +%Y%m%d_%H%M%S)_api.zip" api/
+                      rm -rf api
+                      unzip api.zip -d api
+                      rm api.zip
