@@ -11,7 +11,7 @@ const app = express();
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/api', (req, res) => {
-    res.send({ message: 'Elvana!' });
+    res.send({ message: 'Marre!' });
 });
 
 const port = process.env.port || 3333;
