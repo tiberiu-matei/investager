@@ -15,6 +15,6 @@ EXPOSE 3001
 
 ENV NODE_ENV=production
 ENV APP_PATH=apps/${APP}/server.js
-ENV PORT 3001
+ENV PORT=3001
 
 CMD node $APP_PATH
