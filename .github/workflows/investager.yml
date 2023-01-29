@@ -1,10 +1,17 @@
 name: CI
 on:
     push:
+
 concurrency: investager
+
+env:
+    REGISTRY: ghcr.io
+
 jobs:
     build:
         runs-on: ubuntu-latest
+        permissions:
+            packages: write
         outputs:
             ui-affected: ${{ steps.ui-affected.outputs.ui-affected }}
             api-affected: ${{ steps.api-affected.outputs.api-affected }}
@@ -21,90 +28,50 @@ jobs:
             - run: npx nx affected --target=test --parallel=3 --ci --code-coverage
             - run: npx nx affected --target=build --parallel=3
 
+            - name: Log in to the Container registry
+              if: github.ref == 'refs/heads/main'
+              uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
             - id: ui-affected
               run: if test -d dist/apps/ui; then echo "ui-affected=true" >> $GITHUB_OUTPUT; else echo "ui-affected=false" >> $GITHUB_OUTPUT; fi
-            - name: Zip UI
-              if: ${{ steps.ui-affected.outputs.ui-affected == 'true' }}
-              run: (cd dist/apps/ui && zip -r ui.zip .)
-            - name: Upload UI
-              if: ${{ steps.ui-affected.outputs.ui-affected == 'true' }}
-              uses: actions/upload-artifact@v3
+            - name: Extract UI metadata (tags, labels) for Docker
+              if: ${{ steps.ui-affected.outputs.ui-affected == 'true' && github.ref == 'refs/heads/main' }}
+              id: meta-ui
+              uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96
               with:
-                  name: ui
-                  path: dist/apps/ui/ui.zip
+                  images: ${{ env.REGISTRY }}/${{ github.repository }}/ui
+                  tags: |
+                      type=sha
+            - name: Make and push UI
+              if: ${{ steps.ui-affected.outputs.ui-affected == 'true' && github.ref == 'refs/heads/main' }}
+              uses: docker/build-push-action@37abcedcc1da61a57767b7588cb9d03eb57e28b3
+              with:
+                  context: .
+                  file: apps/ui/Dockerfile.dockerfile
+                  push: true
+                  tags: ${{ steps.meta-ui.outputs.tags }}
+                  labels: ${{ steps.meta-ui.outputs.labels }}
 
             - id: api-affected
               run: if test -d dist/apps/api; then echo "api-affected=true" >> $GITHUB_OUTPUT; else echo "api-affected=false" >> $GITHUB_OUTPUT; fi
-            - name: Zip API
-              if: ${{ steps.api-affected.outputs.api-affected == 'true' }}
-              run: (cd dist/apps/api && zip -r api.zip .)
-            - name: Upload API
-              if: ${{ steps.api-affected.outputs.api-affected == 'true' }}
-              uses: actions/upload-artifact@v3
+            - name: Extract API metadata (tags, labels) for Docker
+              if: ${{ steps.api-affected.outputs.api-affected == 'true' && github.ref == 'refs/heads/main' }}
+              id: meta-api
+              uses: docker/metadata-action@507c2f2dc502c992ad446e3d7a5dfbe311567a96
               with:
-                  name: api
-                  path: dist/apps/api/api.zip
-    deploy-ui:
-        if: github.ref == 'refs/heads/main'
-        runs-on: ubuntu-latest
-        needs: build
-        steps:
-            - name: Get artifact
-              if: ${{ needs.build.outputs.ui-affected == 'true' }}
-              uses: actions/download-artifact@v3
+                  images: ${{ env.REGISTRY }}/${{ github.repository }}/api
+                  tags: |
+                      type=sha
+            - name: Make and push API
+              if: ${{ steps.api-affected.outputs.api-affected == 'true' && github.ref == 'refs/heads/main' }}
+              uses: docker/build-push-action@37abcedcc1da61a57767b7588cb9d03eb57e28b3
               with:
-                  name: ui
-            - name: Copy artifact
-              if: ${{ needs.build.outputs.ui-affected == 'true' }}
-              uses: appleboy/scp-action@master
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.KEY }}
-                  source: 'ui.zip'
-                  target: '/home/ubuntu'
-            - name: Upgrade
-              if: ${{ needs.build.outputs.ui-affected == 'true' }}
-              uses: appleboy/ssh-action@master
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.KEY }}
-                  script: |
-                      cd /home/ubuntu
-                      zip -r "$(date +%Y%m%d_%H%M%S)_ui.zip" ui/
-                      rm -rf ui
-                      unzip ui.zip -d ui
-                      rm ui.zip
-    deploy-api:
-        if: github.ref == 'refs/heads/main'
-        runs-on: ubuntu-latest
-        needs: build
-        steps:
-            - name: Get artifact
-              if: ${{ needs.build.outputs.api-affected == 'true' }}
-              uses: actions/download-artifact@v3
-              with:
-                  name: api
-            - name: Copy artifact
-              if: ${{ needs.build.outputs.api-affected == 'true' }}
-              uses: appleboy/scp-action@master
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.KEY }}
-                  source: 'api.zip'
-                  target: '/home/ubuntu'
-            - name: Upgrade
-              if: ${{ needs.build.outputs.api-affected == 'true' }}
-              uses: appleboy/ssh-action@master
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  key: ${{ secrets.KEY }}
-                  script: |
-                      cd /home/ubuntu
-                      zip -r "$(date +%Y%m%d_%H%M%S)_api.zip" api/
-                      rm -rf api
-                      unzip api.zip -d api
-                      rm api.zip
+                  context: .
+                  file: apps/api/Dockerfile.dockerfile
+                  push: true
+                  tags: ${{ steps.meta-api.outputs.tags }}
+                  labels: ${{ steps.meta-api.outputs.labels }}
