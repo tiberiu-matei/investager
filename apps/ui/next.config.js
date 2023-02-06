@@ -18,6 +18,7 @@ const nextConfig = {
         // this includes files from the monorepo base two directories up
         outputFileTracingRoot: join(__dirname, '../../'),
     },
+    basePath: '/ui',
 };
 
 module.exports = withNx(nextConfig);
