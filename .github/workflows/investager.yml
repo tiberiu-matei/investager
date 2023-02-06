@@ -45,7 +45,7 @@ jobs:
               with:
                   images: ${{ env.REGISTRY }}/${{ github.repository }}/ui
                   tags: |
-                      type=sha
+                      type=raw,value={{branch}}-{{sha}}-{{date 'X'}}
                       type=raw,value=latest
             - name: Make and push UI
               if: ${{ steps.ui-affected.outputs.ui-affected == 'true' && github.ref == 'refs/heads/main' }}
@@ -66,7 +66,7 @@ jobs:
               with:
                   images: ${{ env.REGISTRY }}/${{ github.repository }}/api
                   tags: |
-                      type=sha
+                      type=raw,value={{branch}}-{{sha}}-{{date 'X'}}
                       type=raw,value=latest
             - name: Make and push API
               if: ${{ steps.api-affected.outputs.api-affected == 'true' && github.ref == 'refs/heads/main' }}
