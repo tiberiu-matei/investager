@@ -7,7 +7,7 @@ export default function CustomApp({ Component, pageProps }: AppProps) {
         <>
             <Head>
                 <title>investager</title>
-                <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+                <link rel="icon" type="image/x-icon" href="/ui/favicon.ico" />
             </Head>
             <main>
                 <Component {...pageProps} />
