@@ -11,7 +11,7 @@ const app = express();
 app.use('/api/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/api/ping', (req, res) => {
-    res.send({ message: 'gjata' });
+    res.send({ message: 'dd' });
 });
 
 const port = process.env.PORT || 3333;
