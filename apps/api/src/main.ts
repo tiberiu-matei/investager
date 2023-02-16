@@ -1,8 +1,4 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
+import { elvana } from '@investager/common';
 import * as express from 'express';
 import * as path from 'path';
 
@@ -11,7 +7,7 @@ const app = express();
 app.use('/api/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/api/ping', (req, res) => {
-    res.send({ message: 'dhrata' });
+    res.send({ message: elvana() });
 });
 
 const port = process.env.PORT || 3333;
