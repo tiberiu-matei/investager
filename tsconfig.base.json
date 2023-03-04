@@ -16,7 +16,8 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@investager/common": ["libs/common/src/index.ts"]
+            "@investager/common": ["libs/common/src/index.ts"],
+            "@investager/db": ["libs/db/src/index.ts"]
         }
     },
     "exclude": ["node_modules", "tmp"]

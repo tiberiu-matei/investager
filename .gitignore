@@ -5,6 +5,10 @@ dist
 tmp
 /out-tsc
 
+# env files
+.env.local
+libs/db/prisma/.env
+
 # dependencies
 node_modules
 
