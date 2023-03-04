@@ -11,10 +11,10 @@ COPY --chown=nextjs:nodejs /dist/apps/${APP}/public ./apps/${APP}/public
 
 USER nextjs
 
-EXPOSE 3001
+EXPOSE 3000
 
 ENV NODE_ENV=production
 ENV APP_PATH=apps/${APP}/server.js
-ENV PORT=3001
+ENV PORT=3000
 
 CMD node $APP_PATH
