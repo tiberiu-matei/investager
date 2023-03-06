@@ -25,8 +25,6 @@ jobs:
             - run: npx nx affected --target=test --parallel=3 --ci --code-coverage
             - run: npx nx affected --target=build --parallel=3
 
-            - run: cd node_modules && ls -ltr
-
             - name: Set up QEMU
               uses: docker/setup-qemu-action@e81a89b1732b9c48d79cd809d8d81d79c4647a18
             - name: Set up Docker Buildx
@@ -72,6 +70,9 @@ jobs:
                   tags: |
                       type=raw,value={{branch}}-{{sha}}-{{date 'X'}}
                       type=raw,value=latest
+
+            - run: cd node_modules && ls -ltr
+
             - name: Make and push Migrator
               if: ${{ steps.migrator-affected.outputs.migrator-affected == 'true' && github.ref == 'refs/heads/main' }}
               uses: docker/build-push-action@37abcedcc1da61a57767b7588cb9d03eb57e28b3
