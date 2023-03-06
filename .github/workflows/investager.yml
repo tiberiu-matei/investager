@@ -25,7 +25,7 @@ jobs:
             - run: npx nx affected --target=test --parallel=3 --ci --code-coverage
             - run: npx nx affected --target=build --parallel=3
 
-            - run: ls -ltr
+            - run: cd node_modules && ls -ltr
 
             - name: Set up QEMU
               uses: docker/setup-qemu-action@e81a89b1732b9c48d79cd809d8d81d79c4647a18
