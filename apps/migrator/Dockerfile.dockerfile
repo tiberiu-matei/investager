@@ -5,6 +5,8 @@ COPY /package.json ./
 COPY /package-lock.json ./
 RUN npm i
 RUN ls -ltr
+COPY node_modules/@prisma /prismabin/@prisma
+COPY node_modules/prisma /prismabin/prisma
 
 FROM node:18-alpine
 ARG DBLIB=db
