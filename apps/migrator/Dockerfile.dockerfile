@@ -1,6 +1,8 @@
 FROM node:18-alpine
 ARG CACHEBUST=1
 RUN echo "$CACHEBUST"
+ADD https://google.com cache_bust
+RUN apk add --no-cache wget
 ENV NODE_ENV=development
 WORKDIR /temp
 COPY /package.json ./
