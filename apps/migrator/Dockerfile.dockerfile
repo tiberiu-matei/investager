@@ -1,5 +1,6 @@
 FROM node:18-alpine
 WORKDIR /prismabin
+COPY ["package.json", "package-lock.json", "./"]
 RUN ls -ltr
 RUN npm i
 RUN echo "blaaa"
