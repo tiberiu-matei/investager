@@ -1,5 +1,6 @@
 FROM node:18-alpine
 ARG CACHEBUST=$(date +%s)
+RUN echo "$CACHEBUST"
 ENV NODE_ENV=development
 WORKDIR /temp
 COPY /package.json ./
