@@ -1,6 +1,9 @@
 FROM node:18-alpine
 WORKDIR /prismabin
+RUN ls -ltr
 RUN npm i
+RUN echo "blaaa"
+RUN ls -ltr
 COPY /node_modules/@prisma ./@prisma
 COPY /node_modules/prisma ./prisma
 
