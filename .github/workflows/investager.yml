@@ -80,5 +80,7 @@ jobs:
                   file: apps/migrator/Dockerfile.dockerfile
                   platforms: linux/amd64,linux/arm64
                   push: true
+                  no-cache-filters: |
+                      0
                   tags: ${{ steps.meta-migrator.outputs.tags }}
                   labels: ${{ steps.meta-migrator.outputs.labels }}
