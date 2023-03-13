@@ -1,14 +1,12 @@
 FROM node:18-alpine
 ARG CACHEBUST=1
-RUN echo "$CACHEBUST"
-ADD https://google.com cache_bust
-RUN apk add --no-cache wget
 ENV NODE_ENV=development
 WORKDIR /temp
 COPY /package.json ./
 COPY /package-lock.json ./
-RUN npm i
-RUN ls -ltr
+RUN echo "$CACHEBUST" \
+    && npm i \
+    && ls -ltr
 COPY /temp/node_modules/@prisma /prismabin/@prisma
 COPY /temp/node_modules/prisma /prismabin/prisma
 
