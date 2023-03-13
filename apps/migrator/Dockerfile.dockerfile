@@ -1,4 +1,5 @@
 FROM node:18-alpine
+ARG CACHEBUST=$(date +%s)
 ENV NODE_ENV=development
 WORKDIR /temp
 COPY /package.json ./
