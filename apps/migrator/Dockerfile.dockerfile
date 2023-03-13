@@ -1,10 +1,7 @@
 FROM node:18-alpine
-WORKDIR /prismabin
 COPY ["package.json", "package-lock.json", "./"]
-RUN --no-cache ls -ltr
 RUN npm i
-RUN echo "blaaa"
-RUN ls -ltr
+WORKDIR /prismabin
 COPY /node_modules/@prisma ./@prisma
 COPY /node_modules/prisma ./prisma
 
