@@ -1,5 +1,5 @@
 FROM node:18-alpine
-ARG CACHEBUST=$(date +%s)
+ARG CACHEBUST=1
 RUN echo "$CACHEBUST"
 ENV NODE_ENV=development
 WORKDIR /temp

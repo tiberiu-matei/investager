@@ -80,5 +80,7 @@ jobs:
                   platforms: linux/amd64,linux/arm64
                   no-cache: true
                   push: true
+                  build-args: |
+                      CACHEBUST=$(date +%s)
                   tags: ${{ steps.meta-migrator.outputs.tags }}
                   labels: ${{ steps.meta-migrator.outputs.labels }}
