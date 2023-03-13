@@ -25,6 +25,9 @@ jobs:
             - run: npx nx affected --target=test --parallel=3 --ci --code-coverage
             - run: npx nx affected --target=build --parallel=3
 
+            - id: current-date
+              run: echo "current-date=$(date +%s)" >> $GITHUB_OUTPUT
+
             - name: Set up QEMU
               uses: docker/setup-qemu-action@e81a89b1732b9c48d79cd809d8d81d79c4647a18
             - name: Set up Docker Buildx
@@ -81,6 +84,6 @@ jobs:
                   no-cache: true
                   push: true
                   build-args: |
-                      CACHEBUST=$(date +%s)
+                      CACHEBUST=${{ steps.current-date.outputs.current-date }}
                   tags: ${{ steps.meta-migrator.outputs.tags }}
                   labels: ${{ steps.meta-migrator.outputs.labels }}
