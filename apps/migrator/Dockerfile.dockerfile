@@ -1,9 +1,10 @@
 FROM node:18-alpine
-COPY ["package.json", "package-lock.json", "./"]
+ENV NODE_ENV=development
+WORKDIR /temp
+COPY /package.json ./
+COPY /package-lock.json ./
 RUN npm i
-WORKDIR /prismabin
-COPY /node_modules/@prisma ./@prisma
-COPY /node_modules/prisma ./prisma
+RUN ls -ltr
 
 FROM node:18-alpine
 ARG DBLIB=db
